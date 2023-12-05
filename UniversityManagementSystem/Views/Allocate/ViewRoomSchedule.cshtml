@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "View Schedule";
+}
+<br />
+<br />
+<h2 class="text-info">View Class Schedule and Room Allocation Information</h2>
+
+<div class="p-4 rounded border">
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label>Department</label>
+        </div>
+        <div class="col-5">
+            @Html.DropDownList("DepartmentId", ViewBag.Departments as SelectList, "--Select Department--", new { id = "ddlDepartments", @class = "form-select" })
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div>
+    <table class="table table-striped" id="myTable">
+        <thead>
+            <tr class="table-info">
+                <th>
+                    Course Code
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    
+                </th>
+                <th>Schedule Info</th>
+
+            </tr>
+        </thead>
+        <tbody id="courseInfo">
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Hide the table initially
+            $("#myTable").hide();
+
+            $("#ddlDepartments").change(function () {
+                var departmentId = $(this).val();
+                $.ajax({
+                    type: "POST",
+                    url: "/Allocate/ViewRoomSchedule",
+                    data: { departmentId: departmentId },
+                    success: function (allocates) {
+                        // console.log(allocates)
+                        var courseInfo = $("#courseInfo");
+                        courseInfo.empty();
+
+                        // Check if a department is selected
+                        if (departmentId) {
+                            // Show the table
+                            $("#myTable").show();
+
+                            $.each(allocates, function (index, course) {
+                                // console.log(course);
+                                // Create a row for course information
+                                var row = $(
+                                    `<tr>
+                    <td>${course.code}</td>
+                    <td>${course.name}</td>
+                    <td></td> <!-- Placeholder for ScheduleInfo -->
+                </tr>`
+                                );
+
+                                // Append the row to your table
+                                courseInfo.append(row);
+
+                                // Iterate over ScheduleInfo and append additional <td> elements
+                                $.each(course.scheduleInfo, function (index, schedule) {
+                                    row.append(
+                                        schedule.roomNo != "Not allocated yet"
+                                            ? `<div>
+                                  <div>R. No: ${schedule.roomNo}, ${schedule.dayName}, ${schedule.fromTime} - ${schedule.toTime}.</div>
+                               </div>`
+                                            : `<td>
+                                          <div>Not allocated yet</div>
+                       </td>`
+                                    );
+                                });
+                            });
+                        } else {
+                            // Hide the table if no department is selected
+                            $("#myTable").hide();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

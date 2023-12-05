@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="">
+    <h1 class="display-4 text-center">Welcome To University Management System</h1>
+    <div class="row mt-5">
+        <div class="col-6">
+            <h2 class="text-info">Here is our departments</h2>
+        </div>
+        
+    </div>
+    <div class="mt-3">
+        <table class="table table-striped border" id="myTable">
+            <thead>
+                <tr class="table-info">
+                    <th>
+                        Code
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in @ViewBag.Departments)
+                {
+                    <tr>
+                        <td>
+                            @item.Code
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-6">
+            <h2 class="text-info">Our Respectable Teachers Info</h2>
+        </div>
+
+    </div>
+    <div class="mt-3 mb-5">
+        <table class="table table-striped border" id="myTable">
+            <thead>
+                <tr class="table-info">
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Contact
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in @ViewBag.Teachers)
+                {
+                    <tr>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @item.Email
+                        </td>
+                        <td>
+                            @item.ContactNo
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

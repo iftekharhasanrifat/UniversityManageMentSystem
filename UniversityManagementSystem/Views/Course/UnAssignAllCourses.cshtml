@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewData["Title"] = "UnAssignAllCourses";
+}
+
+<h2 class="text-info">Are you sure you want to unassign courses?</h2>
+<form id="allocate-room" asp-action="UnAssignAllCourses" method="post" enctype="multipart/form-data">
+    <div class="p-4 rounded border">
+        <div class="form-group text-center">
+            <input type="submit" class="btn btn-danger" value="Unassign Courses" />
+            <a asp-action="Index" class="btn btn-success">Back to List</a>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,131 @@
+﻿@model UniversityManagementSystem.Models.Result
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2 class="text-info">View Result</h2>
+<div class="p-4 rounded border">
+    <div asp-validation-summary="ModelOnly" class="text-danger">
+    </div>
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label asp-for="StudentId"></label>
+        </div>
+        <div class="col-5">
+            @Html.DropDownList("StudentId", ViewBag.Students as SelectList, "--Select Student--", new { id = "ddlStudents", @class = "form-select" })
+            <span asp-validation-for="StudentId" class="text-danger"></span>
+        </div>
+
+    </div>
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label asp-for="Name"></label>
+        </div>
+        <div class="col-5">
+            <input asp-for="Name" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label asp-for="Email"></label>
+        </div>
+        <div class="col-5">
+            <input asp-for="Email" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label asp-for="Department"></label>
+        </div>
+        <div class="col-5">
+            <input asp-for="Department" readonly class="form-control" />
+        </div>
+    </div>
+</div>
+<div class="mt-5">
+    <table class="table table-striped border" id="myTable">
+        <thead>
+            <tr class="table-info">
+                <th>
+                    Course Code
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Grade
+                </th>
+               
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody id="studentInfo">
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        $(document).ready(function () {
+            $("#myTable").hide();
+            $("#ddlStudents").change(function () {
+                var studentId = $(this).val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Result/GetStudentByStudentId",
+                    data: { studentId: studentId },
+                    success: function (student) {
+                        $("#Name").val(student?.name);
+                        $("#Email").val(student?.email);
+                        $("#Department").val(student?.department?.code);
+                        getAndPopulateResult();
+                    }
+                });
+            });
+            function getAndPopulateResult() {
+                // Second AJAX call to get courses based on the selected student
+                var studentId = $("#ddlStudents").val();
+                $.ajax({
+                    type: "POST",
+                    url: "/Result/GetResultsByStudentId",
+                    data: { studentId: studentId },
+                    success: function (results) {
+                        var studentInfo = $("#studentInfo");
+                        studentInfo.empty();
+
+                        // Check if a student is selected
+                        if (studentId) {
+                            // Show the table
+                            $("#myTable").show();
+
+                            $.each(results, function (index, result) {
+                                // console.log(result);
+                                studentInfo.append($(
+                                    `<tr>
+                                         <td>${result.courseCode}</td>
+                                         <td>${result.courseName}</td>
+                                         <td>${result.grade}</td>
+                                         <td></td>
+                                     </tr>`
+                                ));
+                            });
+                        } else {
+                            // Hide the table if no department is selected
+                            $("#myTable").hide();
+                        }
+                    }
+                });
+            };
+
+        });
+
+    </script>
+}

@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "ViewCourseStatus";
+}
+<br />
+<br />
+<h2 class="text-info">View Course Status</h2>
+
+<div class="p-4 rounded border">
+    
+    <div class="form-group row mb-2">
+        <div class="col-2">
+            <label>Department</label>
+        </div>
+        <div class="col-5">
+            @Html.DropDownList("DepartmentId", ViewBag.Departments as SelectList, "--Select Department--", new { id = "ddlDepartments", @class = "form-select" })
+        </div>
+
+    </div>
+</div>
+<br />
+<br />
+
+<div class="">
+    <table  class="table table-striped border" id="myTable">
+        <thead>
+            <tr class="table-info">
+                <th>
+                    Code
+                </th>
+                <th>
+                    Name/Title
+                </th>
+                <th>
+                    Semester
+                </th>
+                <th>
+                    Assign To
+                </th>
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody id="courseInfo">
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Hide the table initially
+            $("#myTable").hide();
+
+            $("#ddlDepartments").change(function () {
+                var departmentId = $(this).val();
+                $.ajax({
+                    type: "POST",
+                    url: "/Course/ViewCourseStatus",
+                    data: { departmentId: departmentId },
+                    success: function (courseStatus) {
+                        var courseInfo = $("#courseInfo");
+                        courseInfo.empty();
+
+                        // Check if a department is selected
+                        if (departmentId) {
+                            // Show the table
+                            $("#myTable").show();
+
+                            $.each(courseStatus, function (index, course) {
+                                // console.log(course);
+                                courseInfo.append($(
+                                    `<tr>
+                                                <td>${course.code}</td>
+                                                <td>${course.name}</td>
+                                                <td>${course.semesterName}</td>
+                                                <td>${course.assignTo}</td>
+                                                <td></td>
+                                            </tr>`
+                                ));
+                            });
+                        } else {
+                            // Hide the table if no department is selected
+                            $("#myTable").hide();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+
+

@@ -1,0 +1,128 @@
+﻿@model UniversityManagementSystem.Models.EnrollCourseVm
+
+@{
+    ViewData["Title"] = "Enroll";
+}
+
+<h2 class="text-info">Enroll Course</h2>
+<form id="enroll-course" asp-action="Enroll" method="post" enctype="multipart/form-data">
+    <div class="p-4 rounded border">
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="StudentId"></label>
+            </div>
+            <div class="col-5">
+                @Html.DropDownList("StudentId", ViewBag.Students as SelectList, "--Select Student--", new { id = "ddlStudents", @class = "form-select" })
+                <span asp-validation-for="StudentId" class="text-danger"></span>
+            </div>
+
+        </div>
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="Name"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Name" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="Email"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Email" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="Department"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Department" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="CourseId"></label>
+
+            </div>
+            <div class="col-5">
+                @Html.DropDownList("CourseId", ViewBag.Courses as SelectList, "--Select Course--", new { id = "ddlCourses", @class = "form-select" })
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+
+            </div>
+        </div>
+        
+        <div class="form-group row mb-2">
+            <div class="col-2">
+                <label asp-for="Date"></label>
+            </div>
+            <div class="col-5">
+                <input type="text" readonly asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+                <span class="text-danger">@ViewBag?.Message</span>
+            </div>
+        </div>
+      
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Enroll" />
+            <a asp-action="Index" class="btn btn-success">Back to List</a>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        var departmentId;
+        $(document).ready(function () {
+            $("#ddlStudents").change(function () {
+                var studentId = $(this).val();
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/Course/GetStudentByStudentId",
+                    data: { studentId: studentId },
+                    success: function (student) {
+                        departmentId = student?.department?.id;
+                        console.log(departmentId);
+                        $("#Name").val(student?.name);
+                        $("#Email").val(student?.email);
+                        $("#Department").val(student?.department?.code);
+                        getAndPopulateCourses();
+                    }
+                });
+            });
+            function getAndPopulateCourses() {
+                // Second AJAX call to get courses based on the selected department
+                $.ajax({
+                    type: "POST",
+                    url: "/Course/GetCoursesByDepartmentId",
+                    data: { departmentId: departmentId },
+                    success: function (courses) {
+                        var ddlCourses = $("#ddlCourses");
+                        ddlCourses.empty();
+                        ddlCourses.append($("<option></option>").val("").html("--Select Course--"));
+
+                        $.each(courses, function (index, course) {
+                            // console.log(course);
+                            ddlCourses.append($("<option></option>").val(course.id).html(course.code));
+                        });
+                    }
+                });
+            };
+            $("#Date").datepicker({
+                showAnim: "clip",
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+
+    </script>
+}

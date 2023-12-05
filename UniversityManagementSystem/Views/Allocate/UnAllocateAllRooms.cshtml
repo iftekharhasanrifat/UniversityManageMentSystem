@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "UnAllocateRooms";
+}
+
+<h2 class="text-info">Are you sure you want to unallocate rooms?</h2>
+<form id="allocate-room" asp-action="UnAllocateAllRooms" method="post" enctype="multipart/form-data">
+    <div class="p-4 rounded border">
+        <div class="form-group text-center">
+            <input type="submit" class="btn btn-danger" value="Unallocate Rooms" />
+            <a asp-action="ViewRoomSchedule" class="btn btn-success">Back to List</a>
+        </div>
+    </div>
+</form>
